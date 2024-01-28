@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 
 const apiKey = process.env.VITE_API_KEY || ""
 const endpointRoot = process.env.VITE_API_URL
@@ -9,7 +9,7 @@ const endpointRoot = process.env.VITE_API_URL
 const prefectures = ref<string[]>([])
 const checkedPrefectures = ref<string[]>([])
 
-async function fetchData() {
+async function fetchPrefectureData() {
   try {
     const res = await fetch(
       `${endpointRoot}/api/v1/prefectures`,
@@ -17,25 +17,60 @@ async function fetchData() {
     )
     const prefecturesData = await res.json()
     prefectures.value = prefecturesData.result.map((val => ({ ...val, isChecked: false })))
-    console.log(prefectures.value)
+    // console.log(prefectures.value)
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 }
 
-fetchData()
+const emit = defineEmits(['onAddSeries', 'onRemoveSeries'])
+
+async function drawChart(id, name) {
+  // prefCodeを元に、県の人口推移を取得
+  try {
+     const res = await fetch(
+      `${endpointRoot}/api/v1/population/composition/perYear?cityCode=-&prefCode=${id}`,
+      {headers: {"x-api-key": apiKey}}
+    )
+    const data = await res.json()
+    // console.log(data)
+    const populationData = data.result.data[0].data.map(item => item.value)
+    // console.log(data)
+    // console.log(populationData)
+    // chartにデータを追加、親の関数を発火
+    emit("onAddSeries", id, name, populationData)
+    prefectures.value[id - 1].isChecked = true
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+function deleteChart(id) {
+  emit("onRemoveSeries", id)
+  prefectures.value[id - 1].isChecked = false
+}
+
+function toggleShowChart(id, name, isChecked) {
+  if (isChecked) {
+    deleteChart(id)
+  } else {
+   drawChart(id, name)
+  }
+}
+
+fetchPrefectureData()
 </script>
 
 <template>
   <h2>都道府県</h2>
   <div class="checkbox-container">
     <div class="checkbox-wrapper" v-for="prefecture in prefectures" :key="prefecture.id">
-      <input type="checkbox" :id="prefecture.prefCode" :value="prefecture" :checked="prefecture.isChecked" v-model="checkedPrefectures" />
+      <input type="checkbox" :id="prefecture.prefCode" :value="prefecture" :checked="prefecture.isChecked" v-model="checkedPrefectures" @click="toggleShowChart(prefecture.prefCode, prefecture.prefName, prefecture.isChecked)" />
       <label :for="prefecture.prefCode">{{ prefecture.prefName }}</label>
     </div>
   </div>
   <br>
-  <span>Checked: {{ checkedPrefectures }}</span>
+  <!-- <span>Checked: {{ checkedPrefectures }}</span> -->
 </template>
 
 <style scoped>
