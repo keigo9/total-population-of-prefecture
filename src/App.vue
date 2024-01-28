@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Header from './components/Header.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import PrefectureCheckbox from './components/PrefectureCheckbox.vue'
 </script>
 
 <template>
@@ -9,6 +9,6 @@ import TheWelcome from './components/TheWelcome.vue'
   </header>
 
   <main>
-    <TheWelcome />
+    <PrefectureCheckbox />
   </main>
 </template>
