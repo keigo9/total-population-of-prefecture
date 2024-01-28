@@ -49,3 +49,8 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### Chart
+
+- https://www.highcharts.com/
+- https://github.com/smithalan92/vue3-highcharts
