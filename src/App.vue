@@ -5,7 +5,12 @@ import PrefectureCheckbox from './components/PrefectureCheckbox.vue'
 import { Chart } from 'highcharts-vue';
 import { ref, computed } from 'vue';
 
-const seriesData = ref([]);
+interface SeriesDataItem {
+  id: number;
+  name: string;
+  data: number[];
+}
+const seriesData = ref<SeriesDataItem[]>([]);
 const categories = ref([ 
   1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 
   2015, 2020, 2025, 2030, 2035, 2040, 2045,
@@ -56,7 +61,7 @@ const chartOptions = computed(() => ({
 }
 }));
 
-const addSeries = (id, name, population) => {
+const addSeries = (id: number, name: string, population: number[]) => {
   // console.log(id, name, population)
   // console.log("addSerires on fire")
   seriesData.value = [...seriesData.value, {
@@ -66,7 +71,7 @@ const addSeries = (id, name, population) => {
   }];
 };
 
-const removeSeries = (id) => {
+const removeSeries = (id: number) => {
   // console.log("removeSerires on fire")
   seriesData.value = seriesData.value.filter(val => val.id !== id);
 };

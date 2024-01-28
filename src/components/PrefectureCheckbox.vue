@@ -6,8 +6,23 @@ const endpointRoot = process.env.VITE_API_URL
 // console.log(apiKey)
 // console.log(endpointRoot)
 
-const prefectures = ref<string[]>([])
-const checkedPrefectures = ref<string[]>([])
+interface Prefecture {
+  prefCode: number;
+  prefName: string;
+  isChecked: boolean;
+}
+
+const prefectures = ref<Prefecture[]>([])
+const checkedPrefectures = ref<Prefecture[]>([])
+
+interface PrefectureResultItem {
+  prefCode: number;
+  prefName: string;
+}
+interface populationResultItem {
+  year: number;
+  value: number;
+}
 
 async function fetchPrefectureData() {
   try {
@@ -16,7 +31,7 @@ async function fetchPrefectureData() {
       {headers: {"x-api-key": apiKey}}
     )
     const prefecturesData = await res.json()
-    prefectures.value = prefecturesData.result.map((val => ({ ...val, isChecked: false })))
+    prefectures.value = prefecturesData.result.map(((val: PrefectureResultItem) => ({ ...val, isChecked: false })))
     // console.log(prefectures.value)
   } catch (error) {
     console.error(error)
@@ -25,7 +40,7 @@ async function fetchPrefectureData() {
 
 const emit = defineEmits(['onAddSeries', 'onRemoveSeries'])
 
-async function drawChart(id, name) {
+async function drawChart(id: number, name: string) {
   // prefCodeを元に、県の人口推移を取得
   try {
      const res = await fetch(
@@ -34,7 +49,7 @@ async function drawChart(id, name) {
     )
     const data = await res.json()
     // console.log(data)
-    const populationData = data.result.data[0].data.map(item => item.value)
+    const populationData = data.result.data[0].data.map((item: populationResultItem) => item.value)
     // console.log(data)
     // console.log(populationData)
     // chartにデータを追加、親の関数を発火
@@ -45,12 +60,12 @@ async function drawChart(id, name) {
   }
 }
 
-function deleteChart(id) {
+function deleteChart(id: number) {
   emit("onRemoveSeries", id)
   prefectures.value[id - 1].isChecked = false
 }
 
-function toggleShowChart(id, name, isChecked) {
+function toggleShowChart(id: number, name: string, isChecked: boolean) {
   if (isChecked) {
     deleteChart(id)
   } else {
@@ -64,9 +79,9 @@ fetchPrefectureData()
 <template>
   <h2>都道府県</h2>
   <div class="checkbox-container">
-    <div class="checkbox-wrapper" v-for="prefecture in prefectures" :key="prefecture.id">
-      <input type="checkbox" :id="prefecture.prefCode" :value="prefecture" :checked="prefecture.isChecked" v-model="checkedPrefectures" @click="toggleShowChart(prefecture.prefCode, prefecture.prefName, prefecture.isChecked)" />
-      <label :for="prefecture.prefCode">{{ prefecture.prefName }}</label>
+    <div class="checkbox-wrapper" v-for="prefecture in prefectures" :key="prefecture.prefCode">
+      <input type="checkbox" :id="String(prefecture.prefCode)" :value="prefecture" :checked="prefecture.isChecked" @click="toggleShowChart(prefecture.prefCode, prefecture.prefName, prefecture.isChecked)" />
+      <label :for="String(prefecture.prefCode)">{{ prefecture.prefName }}</label>
     </div>
   </div>
   <br>
