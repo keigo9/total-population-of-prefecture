@@ -12,3 +12,11 @@ import PrefectureCheckbox from './components/PrefectureCheckbox.vue'
     <PrefectureCheckbox />
   </main>
 </template>
+
+<style scoped>
+main {
+  margin: 0 auto;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+</style>

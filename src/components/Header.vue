@@ -22,7 +22,7 @@ defineProps<{
 }
 
 @media (max-width: 1024px) {
-  .headerh1 {
+  .header h1 {
     font-size: 1.5rem;
   }
 }
